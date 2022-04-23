@@ -29,6 +29,7 @@ library(sf)
 library(maps)
 library(gganimate)
 
+#set ggplot theme
 theme_set(theme_classic()+
             theme(axis.text = element_text(color = "black", size = 10)))
 ```
@@ -46,10 +47,34 @@ Workflow/Process:
 
 # Dataset Information
 ``` {r Read in the Data, include = FALSE, echo = FALSE}
-#load the data
+#load the data - daily values is dv
+#reading all the sites in at once, then going to separate them when wrangling
+allsites.raw <- readNWISdv(siteNumbers = c("09209400",
+                                           "09058000",
+                                           "09234500",
+                                           "09251000",
+                                           "09095500",
+                                           "09152500",
+                                           "09315000",
+                                           "09163500",
+                                           "09180000",
+                                           "09739500",
+                                           "09380000",
+                                           "09421500",
+                                           "09520500",
+                                           "09429490"),
+                           parameterCd = "00060", #discharge in cfs
+                           startDate = "", #no set start date
+                           endDate = "2021-09-30") #through the latest water year
 
+#rename columns to make sense
+names(allsites.raw)[4:5] <- c("Discharge_cfs", "Approval_Code")
+
+#write csv with data
+#write_csv(allsites.raw, file = "./Data/Raw/allsites_raw.csv")
+#commented out to allow knitting
 ```
-Data was pulled from the United States Geologic Survey's (USGS) National Water Information System (NWIS) using the dataRetrieval package. Significant tributaries sampled alongside the Colorado include the Gunnison, Yampa, San Juan, Dolores, Green, Gila, and Virgin Rivers. Other relatively large tributaries exist, including the Little Colorado, Roaring Fork, and White rivers, but due to data constraints and an interest in keeping the size of the project under control only the largest tributaries with relatively consistent data were sampled. 
+Data was pulled from the United States Geologic Survey's (USGS) National Water Information System (NWIS) using the dataRetrieval package. Significant tributaries sampled alongside the Colorado include the Gunnison, Yampa, San Juan, Dolores, Green, Gila, and Virgin Rivers. Other relatively large tributaries exist, including the Little Colorado, Roaring Fork, and White rivers, but due to data constraints and an interest in keeping the size of the project under control only the largest tributaries with relatively consistent data were sampled. The gage sites selected were selected both for location convenience and the length of time the gage has been active. Most of these gages have been active since the 1950s, with several active as far back as the early 1900s. Since the data comes from the USGS, it has been subjected to rigorous cleaning and quality approval processes so it is considered to be accurate and trustworthy. 
 
 Table 1: USGS Gages sampled. 
 
@@ -62,13 +87,10 @@ Gage Number | Location
 09095500    |CO River upstream of Grand Junction, CO
 09152500    |Gunnison River near Grand Junction, CO
 09315000    |Green River at Green River, UT
-09163500    |CO River downstream of junction w/ Gunnison
+09163500    |CO River downstream of Grand Junction, CO
 09180000    |Dolores River just upstream of junction w/ Colorado
-09180500    |CO River just downstream of junction w/ Dolores
 09379500    |San Juan River upstream of Lake Powell (intersection w/ the CO)
-09379900    |Lake Powell elevation at Glen Canyon Dam
 09380000    |CO River at Lee's Ferry, AZ
-09415000    |Virgin River above Lake Mead (Littlefield, AZ)
 09421500    |CO River below Hoover Dam
 09520500    |Gila River above Yuma, AZ
 09429490    |CO River above Imperial Dam
