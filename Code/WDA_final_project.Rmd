@@ -5,29 +5,84 @@ output:
     fig_caption: yes
     number_sections: yes
 geometry: margin=2.54cm
-title: "Mapping the Colorado River Flow Over a Year"
+title: "How bad is the current CO River drought?"
 subtitle: "https://github.com/jbc70/Water_Data_Analytics_FinalProject"
 author: "Jack Carpenter"
 fontsize: 12pt
 mainfont: Times New Roman
 
 ---
-
+\newpage
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+#setwd
+getwd()
+
+#load packages
+library(tidyverse)
+library(dataRetrieval)
+library(cowplot)
+library(lubridate)
+library(lfstat)
+library(sf)
+library(maps)
+library(gganimate)
+
+theme_set(theme_classic()+
+            theme(axis.text = element_text(color = "black", size = 10)))
 ```
 
-## R Markdown
+## Rationale and Research Question
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The Colorado River Basin is experiencing a 20+ year drought that is repeatedly referred to as a 'megadrought' in the news media. The goal of this project is to vizualize the differences in discharge of the Colorado River and some of its major tributaries over the last 20 years compared to earlier, wetter, more 'normal' time frames.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Workflow/Process:
+> 1. Identify where are there gages with reliable, long-enough datasets to make this comparison.
+> 2. Separate data at 1999 - the current drought started in the 1999-2000 water year.
+> 3. Examine and compare discharge patterns and volumes across the basin and between time periods.
 
-```{r cars}
-summary(cars)
+\newpage
+
+# Dataset Information
+``` {r Read in the Data, include = FALSE, echo = FALSE}
+#load the data
+
+```
+Data was pulled from the United States Geologic Survey's (USGS) National Water Information System (NWIS) using the dataRetrieval package. Significant tributaries sampled alongside the Colorado include the Gunnison, Yampa, San Juan, Dolores, Green, Gila, and Virgin Rivers. Other relatively large tributaries exist, including the Little Colorado, Roaring Fork, and White rivers, but due to data constraints and an interest in keeping the size of the project under control only the largest tributaries with relatively consistent data were sampled. 
+
+Table 1: USGS Gages sampled. 
+
+Gage Number | Location
+------------|---------------
+09209400    |Green River above Fontenelle Reservoir, WY
+09058000    |CO River near Kremmling, CO
+09234500    |Green River below Flaming Gorge Dam
+09251000    |Yampa River upstream of junction w/ Green
+09095500    |CO River upstream of Grand Junction, CO
+09152500    |Gunnison River near Grand Junction, CO
+09315000    |Green River at Green River, UT
+09163500    |CO River downstream of junction w/ Gunnison
+09180000    |Dolores River just upstream of junction w/ Colorado
+09180500    |CO River just downstream of junction w/ Dolores
+09379500    |San Juan River upstream of Lake Powell (intersection w/ the CO)
+09379900    |Lake Powell elevation at Glen Canyon Dam
+09380000    |CO River at Lee's Ferry, AZ
+09415000    |Virgin River above Lake Mead (Littlefield, AZ)
+09421500    |CO River below Hoover Dam
+09520500    |Gila River above Yuma, AZ
+09429490    |CO River above Imperial Dam
+
+Table 2:Datasets examined
+
+Dataset | Information
+--------|---------------
+
+```{r }
+
 ```
 
-## Including Plots
+## Exploratory Analysis
 
 You can also embed plots, for example:
 
