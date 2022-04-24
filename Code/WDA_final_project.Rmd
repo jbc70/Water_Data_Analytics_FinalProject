@@ -108,11 +108,7 @@ Gage Number | Location
 09520500    |Gila River above Yuma, AZ
 09429490    |CO River above Imperial Dam
 
-Table 2: Datasets used and basic description of them
-
-Dataset | Information
---------|---------------
-
+\newpage
 
 # Exploratory Analysis
 First thing's first: take a look at what data we have to work with. 
@@ -122,6 +118,7 @@ rawdata.plot <- ggplot(allsites.raw, aes(x = Date, y = Discharge_cfs, color = si
   scale_color_viridis_d() +
   scale_y_log10() +
   labs(x = "Date", y = "Discharge (cfs)", color = "Site")
+rawdata.plot
 ```
 After initial visualization, the Gila river data has been thrown out because there are so many zeroes. This is potentially due to the fact that this gage site is very near Yuma, Arizona where there is significant agriculture. Diversions in this area could be artificially lowering the level of the river there because it is such a heavily agricultural area.
 
@@ -134,8 +131,8 @@ allsites.processed <- allsites.raw %>%
   mutate(Baseflow_lfstat = baseflow(Discharge_cfs),#compute baseflow
          Stormflow_lfstat = Discharge_cfs - Baseflow_lfstat, #compute stormflow, but likely won't use it
          Water_Year = water_year(Date), #add water year column - between-year comparison
-         DOY = yday(Date)) #add DOY - in-year comparisons
-
+         DOY = yday(Date),
+         Month = month(Date)) #add DOY - in-year comparisons
 
 #plotting processed data to see if it's any use
 allprocessed.plot <- ggplot(allsites.processed) +
@@ -152,7 +149,7 @@ allprocessed.plot
 
 #let's see if we can isolate just the drought years
 current.drought <- allsites.processed %>%
-  filter(Date >= "1999-09-30")
+  filter(Date > "1999-09-30")
 #plot to see if its worth keeping
 ggplot(current.drought, aes(x = Date, y = Discharge_cfs, color = site_no)) +
   geom_line() +
@@ -161,10 +158,44 @@ ggplot(current.drought, aes(x = Date, y = Discharge_cfs, color = site_no)) +
 ggplot(current.drought, aes(x = DOY, y = Discharge_cfs, color = site_no)) +
   geom_point(alpha = 0.5, size = 0.3) +
   scale_y_log10() +
+  scale_color_viridis_d() +
   labs(x = "Day of Year", y = "Discharge (cfs)", color = "Gage No.")
 #cool data, going to keep it, also allows me to ask a different question
 #write.csv(current.drought, file = "./Data/Processed/current_drought.csv")
 
+#now to select earlier data
+#choosing 1967 b/c Glen Canyon Dam was completed in 1963
+earlier.years <- allsites.processed %>%
+  filter(Date > "1964-09-30" & Date < "1999-10-01")
+
+ggplot(earlier.years, aes(x = DOY, y = Discharge_cfs, color = site_no))+
+  geom_point(alpha = 0.5, size = 0.3) +
+  scale_y_log10() +
+  scale_color_viridis_d() +
+  labs(x = "Day of Year", y = "Discharge (cfs)", color = "Gage No.")
+#write.csv(earlier.years, file = "./Data/Processed/1967to1999.csv")
+
+#realized I gotta make a summary to get useful data
+allsites.summary <- allsites.processed %>%
+  group_by(site_no, Water_Year) %>%
+  summarise(Discharge.acft.yr = sum(Discharge_cfs)*723.968, #convert cfs to ac-ft/yr
+            Baseflow.acft.yr = sum(Baseflow_lfstat)*723.968,
+            Stormflow.acft.yr = sum(Stormflow_lfstat)*723.968,
+            prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
+
+ggplot(allsites.summary, aes(x = Water_Year)) +
+  geom_point(aes(y = Discharge.acft.yr), alpha = 0.8, size = 0.5, color = "grey") +
+  geom_point(aes(y = Baseflow.acft.yr), alpha = 0.8, size = 0.5, color = "black") +
+  scale_color_viridis_d() +
+  labs(x = "Water Year", y = "Flow (ac-ft/yr)")
+
+# now to summarize each time period of interest
+current.drought.summary <- current.drought %>%
+  group_by(site_no,Water_Year)
+```
+
+``` {Individual Sites, include = FALSE}
 #select by sites
 Green.at.Fontenelle <- allsites.processed %>%
   filter(site_no == "09209400")
@@ -194,11 +225,12 @@ CO.at.Imperial <- allsites.processed %>%
   filter(site_no == "09429490")
 
 #now to plot all of these individually
+
 ```
 \newpage
 
 # Analysis
-
+Time series to see trend? For overall and/or by site between two time periods
 
 ## Question 1
 
