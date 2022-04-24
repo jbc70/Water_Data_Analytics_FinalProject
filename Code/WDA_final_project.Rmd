@@ -10,7 +10,8 @@ subtitle: "https://github.com/jbc70/Water_Data_Analytics_FinalProject"
 author: "Jack Carpenter"
 fontsize: 12pt
 mainfont: Times New Roman
-
+editor_options: 
+  chunk_output_type: console
 ---
 \newpage
 ```{r setup, include=FALSE}
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 getwd()
 
 #load packages
-library(tidyverse)
+library(tidyverse) 
 library(dataRetrieval)
 library(cowplot)
 library(lubridate)
@@ -28,15 +29,24 @@ library(lfstat)
 library(sf)
 library(maps)
 library(gganimate)
+library(tseries)
 
 #set ggplot theme
 theme_set(theme_classic()+
             theme(axis.text = element_text(color = "black", size = 10)))
 ```
 
-## Rationale and Research Question
+# Rationale and Research Questions
 
-The Colorado River Basin is experiencing a 20+ year drought that is repeatedly referred to as a 'megadrought' in the news media. The goal of this project is to vizualize the differences in discharge of the Colorado River and some of its major tributaries over the last 20 years compared to earlier, wetter, more 'normal' time frames.
+The Colorado River Basin is experiencing a 20+ year drought that is repeatedly referred to as a 'megadrought' in the news media. The goal of this project is to vizualize the differences in discharge of the Colorado River and some of its major tributaries over the last 20 years compared to earlier, wetter, more 'normal' time frames. In a snowpack-fueled system like the Colorado, timing is also important because runoff provides much of the water entering the system and earlier runoff can make droughts more severe later in the year.
+
+Due to the size and managed nature of the system, different regions in the basin may also be experiencing the drought differently. Another aspect of this project is to look at the different sites to see how flows are different in different parts of the basin. 
+
+Questions:
+
+> 1. How do discharge and baseflow change through the current drought. Is there noticeable change? 
+
+> 2. How do different parts of the basin look during the drought? Are there significant differences by location? 
 
 Workflow/Process:
 > 1. Identify where are there gages with reliable, long-enough datasets to make this comparison.
@@ -70,6 +80,9 @@ allsites.raw <- readNWISdv(siteNumbers = c("09209400",
 #rename columns to make sense
 names(allsites.raw)[4:5] <- c("Discharge_cfs", "Approval_Code")
 
+#check date is actually a date
+class(allsites.raw$Date)
+
 #write csv with data
 #write_csv(allsites.raw, file = "./Data/Raw/allsites_raw.csv")
 #commented out to allow knitting
@@ -95,21 +108,106 @@ Gage Number | Location
 09520500    |Gila River above Yuma, AZ
 09429490    |CO River above Imperial Dam
 
-Table 2:Datasets examined
+Table 2: Datasets used and basic description of them
 
 Dataset | Information
 --------|---------------
 
-```{r }
 
+# Exploratory Analysis
+First thing's first: take a look at what data we have to work with. 
+```{r initial visualization, echo=FALSE}
+rawdata.plot <- ggplot(allsites.raw, aes(x = Date, y = Discharge_cfs, color = site_no)) +
+  geom_point(alpha = 0.5, size = 0.3) +
+  scale_color_viridis_d() +
+  scale_y_log10() +
+  labs(x = "Date", y = "Discharge (cfs)", color = "Site")
 ```
+After initial visualization, the Gila river data has been thrown out because there are so many zeroes. This is potentially due to the fact that this gage site is very near Yuma, Arizona where there is significant agriculture. Diversions in this area could be artificially lowering the level of the river there because it is such a heavily agricultural area.
 
-## Exploratory Analysis
+The next step in exploratory analysis is to wrangle the data into something useful. In this case, that means separating the data by gage. This could have been done by reading each gage in separately, but in this case it was done by filtering the large set already read in. 
 
-You can also embed plots, for example:
+```{r Wrangle like a Data Cowboy, include = FALSE}
+#initial cleanup
+allsites.processed <- allsites.raw %>%
+  filter(site_no != "09520500") %>% #remove the Gila data
+  mutate(Baseflow_lfstat = baseflow(Discharge_cfs),#compute baseflow
+         Stormflow_lfstat = Discharge_cfs - Baseflow_lfstat, #compute stormflow, but likely won't use it
+         Water_Year = water_year(Date), #add water year column - between-year comparison
+         DOY = yday(Date)) #add DOY - in-year comparisons
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+#plotting processed data to see if it's any use
+allprocessed.plot <- ggplot(allsites.processed) +
+  geom_point(aes(x = Water_Year, y = Baseflow_lfstat, color = site_no),
+             alpha = 0.3, size = 0.3) +
+  scale_y_log10() +
+  scale_color_viridis_d() +
+  labs(x = "Water Year", y = "Baseflow (cfs)", color = "Gage #")
+allprocessed.plot
+#cool to see, but not particularly helpful
+#still going to write the csv
+#write_csv(allsites.processed, file = "./Data/Processed/allsites_processed.csv")
+#again, commented out to knit
+
+#let's see if we can isolate just the drought years
+current.drought <- allsites.processed %>%
+  filter(Date >= "1999-09-30")
+#plot to see if its worth keeping
+ggplot(current.drought, aes(x = Date, y = Discharge_cfs, color = site_no)) +
+  geom_line() +
+  scale_y_log10()+
+  labs(x = "Date", y = "Discharge(cfs)", color = "Gage No.")
+ggplot(current.drought, aes(x = DOY, y = Discharge_cfs, color = site_no)) +
+  geom_point(alpha = 0.5, size = 0.3) +
+  scale_y_log10() +
+  labs(x = "Day of Year", y = "Discharge (cfs)", color = "Gage No.")
+#cool data, going to keep it, also allows me to ask a different question
+#write.csv(current.drought, file = "./Data/Processed/current_drought.csv")
+
+#select by sites
+Green.at.Fontenelle <- allsites.processed %>%
+  filter(site_no == "09209400")
+CO.at.Kremmling <- allsites.processed %>%
+  filter(site_no == "09058000")
+Green.below.FlamingGorge <- allsites.processed %>%
+  filter(site_no == "09234500")
+Yampa.above.Green <- allsites.processed %>%
+  filter(site_no == "09251000")
+CO.above.GrandJunction <- allsites.processed %>%
+  filter(site_no == "09095500")
+Gunnison.near.GrandJunction <- allsites.processed %>%
+  filter(site_no == "09152500")
+Green.at.GreenRiver <- allsites.processed %>%
+  filter(site_no == "09315000")
+CO.below.GrandJunction <- allsites.processed %>%
+  filter(site_no == "09163500")
+Dolores.river <- allsites.processed %>%
+  filter(site_no == "09180000")
+SanJuan.River <- allsites.processed %>%
+  filter(site_no == "09379500")
+Lee.Ferry <- allsites.processed %>%
+  filter(site_no == "09380000")
+CO.at.Hoover <- allsites.processed %>%
+  filter(site_no == "09421500")
+CO.at.Imperial <- allsites.processed %>%
+  filter(site_no == "09429490")
+
+#now to plot all of these individually
 ```
+\newpage
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Analysis
+
+
+## Question 1
+
+\newpage
+
+# Summary and Conclusions
+
+\newpage
+
+#References
+
+
