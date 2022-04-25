@@ -5,7 +5,7 @@ output:
     fig_caption: yes
     number_sections: yes
 geometry: margin=2.54cm
-title: "How bad is the current CO River drought?"
+title: "How Does the Current Drought affect the Colorado River?"
 subtitle: "https://github.com/jbc70/Water_Data_Analytics_FinalProject"
 author: "Jack Carpenter"
 fontsize: 12pt
