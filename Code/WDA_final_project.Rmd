@@ -118,7 +118,7 @@ rawdata.plot <- ggplot(allsites.raw, aes(x = Date, y = Discharge_cfs, color = si
   scale_color_viridis_d() +
   scale_y_log10() +
   labs(x = "Date", y = "Discharge (cfs)", color = "Site")
-rawdata.plot
+#rawdata.plot
 ```
 After initial visualization, the Gila river data has been thrown out because there are so many zeroes. This is potentially due to the fact that this gage site is very near Yuma, Arizona where there is significant agriculture. Diversions in this area could be artificially lowering the level of the river there because it is such a heavily agricultural area.
 
@@ -178,62 +178,155 @@ ggplot(earlier.years, aes(x = DOY, y = Discharge_cfs, color = site_no))+
 #realized I gotta make a summary to get useful data
 allsites.summary <- allsites.processed %>%
   group_by(site_no, Water_Year) %>%
-  summarise(Discharge.acft.yr = sum(Discharge_cfs)*723.968, #convert cfs to ac-ft/yr
-            Baseflow.acft.yr = sum(Baseflow_lfstat)*723.968,
-            Stormflow.acft.yr = sum(Stormflow_lfstat)*723.968,
+  summarise(Discharge.acft.yr = mean(Discharge_cfs)*723.968, #convert cfs to ac-ft/yr
+            Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
+            Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
             prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
             prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
 
 ggplot(allsites.summary, aes(x = Water_Year)) +
-  geom_point(aes(y = Discharge.acft.yr), alpha = 0.8, size = 0.5, color = "grey") +
-  geom_point(aes(y = Baseflow.acft.yr), alpha = 0.8, size = 0.5, color = "black") +
+  geom_point(aes(y = Discharge.acft.yr), 
+             alpha = 0.8, size = 0.5, color = "grey") +
+  geom_point(aes(y = Baseflow.acft.yr), 
+             alpha = 0.8, size = 0.5, color = "black") +
   scale_color_viridis_d() +
   labs(x = "Water Year", y = "Flow (ac-ft/yr)")
 
 # now to summarize each time period of interest
 current.drought.summary <- current.drought %>%
-  group_by(site_no,Water_Year)
+  group_by(site_no,Water_Year) %>%
+  summarise(Discharge.acft.yr = mean(Discharge_cfs)*723.968, #convert cfs to ac-ft/yr
+            Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
+            Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
+            prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
+
+earlier.years.summary <- earlier.years %>%
+  group_by(site_no,Water_Year) %>%
+  summarise(Discharge.acft.yr = mean(Discharge_cfs)*723.968, #convert cfs to ac-ft/yr
+            Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
+            Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
+            prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
 ```
 
 ``` {Individual Sites, include = FALSE}
-#select by sites
-Green.at.Fontenelle <- allsites.processed %>%
+#select current drought by sites
+current.Green.at.Fontenelle <- current.drought %>%
   filter(site_no == "09209400")
-CO.at.Kremmling <- allsites.processed %>%
+current.CO.at.Kremmling <- current.drought %>%
   filter(site_no == "09058000")
-Green.below.FlamingGorge <- allsites.processed %>%
+current.Green.below.FlamingGorge <- current.drought %>%
   filter(site_no == "09234500")
-Yampa.above.Green <- allsites.processed %>%
+current.Yampa.above.Green <- current.drought %>%
   filter(site_no == "09251000")
-CO.above.GrandJunction <- allsites.processed %>%
+current.CO.above.GrandJunction <- current.drought %>%
   filter(site_no == "09095500")
-Gunnison.near.GrandJunction <- allsites.processed %>%
+current.Gunnison.near.GrandJunction <- current.drought %>%
   filter(site_no == "09152500")
-Green.at.GreenRiver <- allsites.processed %>%
+current.Green.at.GreenRiver <- current.drought %>%
   filter(site_no == "09315000")
-CO.below.GrandJunction <- allsites.processed %>%
+current.CO.below.GrandJunction <- current.drought %>%
   filter(site_no == "09163500")
-Dolores.river <- allsites.processed %>%
+current.Dolores.river <- current.drought %>%
   filter(site_no == "09180000")
-SanJuan.River <- allsites.processed %>%
+current.SanJuan.River <- current.drought %>%
   filter(site_no == "09379500")
-Lee.Ferry <- allsites.processed %>%
+current.Lee.Ferry <- current.drought %>%
   filter(site_no == "09380000")
-CO.at.Hoover <- allsites.processed %>%
+current.CO.at.Hoover <- current.drought %>%
   filter(site_no == "09421500")
-CO.at.Imperial <- allsites.processed %>%
+current.CO.at.Imperial <- current.drought %>%
   filter(site_no == "09429490")
 
-#now to plot all of these individually
+#select past years by site
+past.Green.at.Fontenelle <- earlier.years %>%
+  filter(site_no == "09209400")
+past.CO.at.Kremmling <- earlier.years %>%
+  filter(site_no == "09058000")
+past.Green.below.FlamingGorge <- earlier.years %>%
+  filter(site_no == "09234500")
+past.Yampa.above.Green <- earlier.years %>%
+  filter(site_no == "09251000")
+past.CO.above.GrandJunction <- earlier.years %>%
+  filter(site_no == "09095500")
+past.Gunnison.near.GrandJunction <- earlier.years %>%
+  filter(site_no == "09152500")
+past.Green.at.GreenRiver <- earlier.years %>%
+  filter(site_no == "09315000")
+past.CO.below.GrandJunction <- earlier.years %>%
+  filter(site_no == "09163500")
+past.Dolores.river <- earlier.years %>%
+  filter(site_no == "09180000")
+past.SanJuan.River <- earlier.years %>%
+  filter(site_no == "09379500")
+past.Lee.Ferry <- earlier.years %>%
+  filter(site_no == "09380000")
+past.CO.at.Hoover <- earlier.years %>%
+  filter(site_no == "09421500")
+past.CO.at.Imperial <- earlier.years %>%
+  filter(site_no == "09429490")
 
 ```
 \newpage
 
 # Analysis
-Time series to see trend? For overall and/or by site between two time periods
 
 ## Question 1
 
+``` {Annual discharge patterns, include = FALSE}
+#get past averages
+past.annual.average.discharge <- mean(earlier.years.summary$Discharge.acft.yr)
+past.annual.average.baseflow <- mean(earlier.years.summary$Baseflow.acft.yr)
+past.annual.average.propbf <- mean(earlier.years.summary$prop.baseflow)
+
+#get current averages
+current.annual.average.discharge <- mean(current.drought.summary$Discharge.acft.yr)
+current.annual.average.baseflow <- mean(current.drought.summary$Baseflow.acft.yr)
+current.annual.average.propbf <- mean(current.drought.summary$prop.baseflow)
+
+
+```
+
+```{Annual discharge boxplots, echo = FALSE, message = FALSE, fig.align = 'left', fig.cap = "Annual Discharge per site during previous years and the current drought"}
+past.boxplot <- ggplot(earlier.years.summary) +
+  geom_boxplot(aes(x = site_no, y = Discharge.acft.yr)) +
+  geom_hline(yintercept = past.annual.average.discharge) +
+  labs(x = "", y = "Discharge (ac-ft/yr)")
+drought.boxplot <- ggplot(current.drought.summary) +
+  geom_boxplot(aes(x = site_no, y = Discharge.acft.yr)) +
+  geom_hline(yintercept = current.annual.average.discharge) +
+  labs(x = "Site", y = "Discharge (ac-ft/yr)")
+Discharge.boxplot <- plot_grid(past.boxplot, drought.boxplot,
+          ncol = 1,
+          align = "hv")
+Discharge.boxplot
+```
+
+```{Annual Discharge, echo = FALSE, message = FALSE, fig.align ='left', fig.cap = "Annual Discharge over time"}
+annualdischarge.plot <- ggplot() +
+  geom_point(data = earlier.years.summary, 
+             aes(x = Water_Year, y = Discharge.acft.yr, color = site_no))+
+  geom_point(data = current.drought.summary, 
+             aes(x = Water_Year, y = Discharge.acft.yr, color = site_no))+
+  scale_x_discrete(breaks = seq(1964,2021,10)) +
+  scale_color_viridis_d() +
+  geom_smooth(method = lm) +
+  labs(x = "Water Year", y = "Discharge (ac-ft/yr)", color = "Gage")
+annualdischarge.plot
+```
+
+```{Annual Proportion of Baseflow, echo = FALSE, message = FALSE, fig.align = 'left', fig.cap = "Annual Proportion of Baseflow Over Time"}
+annualpropbf.plot <- ggplot() +
+  geom_point(data = earlier.years.summary,
+            aes(x = Water_Year, y = prop.baseflow, color = site_no))+
+  geom_point(data = current.drought.summary,
+            aes(x = Water_Year, y = prop.baseflow, color = site_no)) + 
+  scale_x_discrete(breaks = seq(1964,2021,10)) +
+  scale_color_viridis_d() +
+  labs(x = "Water Year", y = "Baseflow Proportion", color = "Gage")
+annualpropbf.plot
+```
 \newpage
 
 # Summary and Conclusions
