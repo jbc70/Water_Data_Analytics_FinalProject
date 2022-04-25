@@ -174,7 +174,12 @@ CO) \\
 
 First thing's first: take a look at what data we have to work with.
 
-\includegraphics{WDA_final_project_files/figure-latex/initial visualization-1.pdf}
+\begin{figure}
+
+\includegraphics{WDA_final_project_files/figure-latex/initial visualization-1} \hfill{}
+
+\caption{Initial Visualization of raw data}\label{fig:initial visualization}
+\end{figure}
 
 That's a lot to look at and not particularly useful. So after a little
 more digging and some other vizualizations that are maybe slightly more
@@ -226,6 +231,7 @@ snowmelt to really drop.
 
 \caption{Discharge plotted by Day of Year (1964-1999)}\label{fig:Select the previous time period}
 \end{figure}
+\newpage
 
 The last wrangling steps were to create summary datasets to look at
 annual changes, although not pictured. Discharge in cubic feet per
@@ -296,6 +302,7 @@ river entering Mexico.
 
 \caption{Annual Discharge over time on log scale}\label{fig:Annual Discharge Trends}
 \end{figure}
+\newpage
 
 Interestingly, we can see that the proportion of flows made up by
 baseflow is increasing over time. I'm not entirely sure why that is the
@@ -323,23 +330,23 @@ soils, or a combination of the two.
 The Colorado River Basin is experiencing extreme drought that is
 starting to show impacts on the river. There is a significant difference
 in mean discharge between the two time periods, about 700,000 acre-feet
-across the whole system. This is a crude figure, but importantly shows
-that there is a significant decrease in water in the system. The lower
-basin appears to be exhibitng more stability during the drought,
-potentially due to management shifts in the 1990s with the completion of
-the Central Arizona Project.
+across the whole system. This is a crude assessment, but importantly
+shows that there is a significant decrease in water in the system. The
+lower basin appears to be exhibiting more stability and less variability
+during the drought, potentially due to management shifts in the 1990s
+with the completion of the Central Arizona Project (Figure 4).
 
 Baseflow proportion is increasing across the entire river system,
-reflecting decreased stormflow. In conjunction with the Day of Year plot
-in the exploratory analysis, this becomes really interesting. A decrease
-in stormflow may explain why there is such a steeper drop after day 200
-than in the earlier period. Fewer (or no) late summer storms means that
-all the water in certain regions is coming from baseflow (probably fed
-by snowmelt) and that drop is a depiction of the discharge really being
-depleted by that lack of stormflow. Snowmelt also is known to be
-happening faster and finishing a little earlier in the year due to
-climate change, so that big dip could also be reflecting the increased
-rate in that process as well.
+reflecting decreased stormflow (Figure 7). In conjunction with the Day
+of Year plot in the exploratory analysis (Figure 2), this becomes really
+interesting. A decrease in stormflow may explain why there is such a
+steeper drop after day 200 than in the earlier period. Fewer (or no)
+late summer storms means that all the water in certain regions is coming
+from baseflow (probably fed by snowmelt) and that drop is a depiction of
+the discharge really being depleted by that lack of stormflow. Snowmelt
+also is known to be happening faster and finishing a little earlier in
+the year due to climate change, so that big dip could also be reflecting
+the increased rate in that process as well.
 
 This analysis barely even started to scratch the surface of what could
 be analyzed looking at the impacts of this drought on the Colorado

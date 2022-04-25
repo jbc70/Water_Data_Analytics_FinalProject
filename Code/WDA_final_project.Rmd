@@ -45,7 +45,8 @@ Due to the size and managed nature of the system, different regions in the basin
 Questions:
 
 > 1. How do discharge and baseflow change through the current drought. Is there noticeable change? 
-  1.a. How do different parts of the basin look during the drought? Are there significant
+  
+  >1.a. How do different parts of the basin look during the drought? Are there significant
   differences by location? 
 
 
