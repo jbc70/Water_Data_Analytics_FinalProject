@@ -45,13 +45,9 @@ Due to the size and managed nature of the system, different regions in the basin
 Questions:
 
 > 1. How do discharge and baseflow change through the current drought. Is there noticeable change? 
+  1.a. How do different parts of the basin look during the drought? Are there significant
+  differences by location? 
 
-> 2. How do different parts of the basin look during the drought? Are there significant differences by location? 
-
-Workflow/Process:
-> 1. Identify where are there gages with reliable, long-enough datasets to make this comparison.
-> 2. Separate data at 1999 - the current drought started in the 1999-2000 water year.
-> 3. Examine and compare discharge patterns and volumes across the basin and between time periods.
 
 \newpage
 
@@ -141,7 +137,7 @@ allprocessed.plot <- ggplot(allsites.processed) +
   scale_y_log10() +
   scale_color_viridis_d() +
   labs(x = "Water Year", y = "Baseflow (cfs)", color = "Gage #")
-allprocessed.plot
+#allprocessed.plot
 #cool to see, but not particularly helpful
 #still going to write the csv
 #write_csv(allsites.processed, file = "./Data/Processed/allsites_processed.csv")
@@ -164,7 +160,7 @@ ggplot(current.drought, aes(x = DOY, y = Discharge_cfs, color = site_no)) +
 #write.csv(current.drought, file = "./Data/Processed/current_drought.csv")
 
 #now to select earlier data
-#choosing 1967 b/c Glen Canyon Dam was completed in 1963
+#choosing 1964 b/c Glen Canyon Dam started filling in 1963
 earlier.years <- allsites.processed %>%
   filter(Date > "1964-09-30" & Date < "1999-10-01")
 
@@ -182,7 +178,20 @@ allsites.summary <- allsites.processed %>%
             Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
             Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
             prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
-            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr) %>%
+   mutate(Site_Name = case_when(site_no == "09209400" ~ "Fontenelle",
+                              site_no == "09058000" ~ "Kremmling",
+                              site_no == "09234500" ~ "Flaming_Gorge",
+                              site_no == "09251000" ~ "Yampa",
+                              site_no == "09095500" ~ "GJ_Upstream",
+                              site_no == "09152500" ~ "Gunnison",
+                              site_no == "09315000" ~ "Green_River",
+                              site_no == "09163500" ~ "GJ_Downstream",
+                              site_no == "09180000" ~ "Dolores",
+                              site_no == "09379500" ~ "San_Juan",
+                              site_no == "09380000" ~ "Lee_Ferry",
+                              site_no == "09421500" ~ "Hoover",
+                              site_no == "09429490" ~ "Imperial"))
 
 ggplot(allsites.summary, aes(x = Water_Year)) +
   geom_point(aes(y = Discharge.acft.yr), 
@@ -199,7 +208,20 @@ current.drought.summary <- current.drought %>%
             Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
             Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
             prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
-            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr) %>%
+  mutate(Site_Name = case_when(site_no == "09209400" ~ "Fontenelle",
+                              site_no == "09058000" ~ "Kremmling",
+                              site_no == "09234500" ~ "Flaming_Gorge",
+                              site_no == "09251000" ~ "Yampa",
+                              site_no == "09095500" ~ "GJ_Upstream",
+                              site_no == "09152500" ~ "Gunnison",
+                              site_no == "09315000" ~ "Green_River",
+                              site_no == "09163500" ~ "GJ_Downstream",
+                              site_no == "09180000" ~ "Dolores",
+                              site_no == "09379500" ~ "San_Juan",
+                              site_no == "09380000" ~ "Lee_Ferry",
+                              site_no == "09421500" ~ "Hoover",
+                              site_no == "09429490" ~ "Imperial")) %>%
 
 earlier.years.summary <- earlier.years %>%
   group_by(site_no,Water_Year) %>%
@@ -207,7 +229,23 @@ earlier.years.summary <- earlier.years %>%
             Baseflow.acft.yr = mean(Baseflow_lfstat)*723.968,
             Stormflow.acft.yr = mean(Stormflow_lfstat)*723.968,
             prop.baseflow = Baseflow.acft.yr/Discharge.acft.yr,
-            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr)
+            prop.stormflow = Stormflow.acft.yr/Discharge.acft.yr) %>%
+   mutate(Site_Name = case_when(site_no == "09209400" ~ "Fontenelle",
+                              site_no == "09058000" ~ "Kremmling",
+                              site_no == "09234500" ~ "Flaming_Gorge",
+                              site_no == "09251000" ~ "Yampa",
+                              site_no == "09095500" ~ "GJ_Upstream",
+                              site_no == "09152500" ~ "Gunnison",
+                              site_no == "09315000" ~ "Green_River",
+                              site_no == "09163500" ~ "GJ_Downstream",
+                              site_no == "09180000" ~ "Dolores",
+                              site_no == "09379500" ~ "San_Juan",
+                              site_no == "09380000" ~ "Lee_Ferry",
+                              site_no == "09421500" ~ "Hoover",
+                              site_no == "09429490" ~ "Imperial")) %>%
+
+#welp realized these are useful joined
+allyears.summary <- full_join(current.drought.summary, earlier.years.summary)
 ```
 
 ``` {Individual Sites, include = FALSE}
@@ -272,7 +310,11 @@ past.CO.at.Imperial <- earlier.years %>%
 
 # Analysis
 
-## Question 1
+## Question: Is there significant change in discharge and baseflow through the current drought compared to the previous 35 years? 
+
+Interestingly, discharge does not appear to have changed much between the two periods, but there is some change. Between 1964 and 1999 the average annual discharge was about 3.8 million acre-feet per year compared to about 3.1 million acre-feet per year between 1999 and 2021. The decrease is significant - about 700,000 acre-feet per year is no small change but smaller than anticipated. 
+Figure X displays that while there was no huge shift in discharge at any one site, there was some interannual variability in discharge, but at different times in the Upper and Lower basins. Prior to the drought in the Lower Basin there appears to be more variability - sites at Lee's Ferry, Hoover Dam, and Imperial Dam all appear to have more range in the earlier time frame. The Upper Basin sites (those other than the three listed above) appear to have slightly more discharge variability during the drought, if anything.
+
 
 ``` {Annual discharge patterns, include = FALSE}
 #get past averages
@@ -289,47 +331,72 @@ current.annual.average.propbf <- mean(current.drought.summary$prop.baseflow)
 ```
 
 ```{Annual discharge boxplots, echo = FALSE, message = FALSE, fig.align = 'left', fig.cap = "Annual Discharge per site during previous years and the current drought"}
-past.boxplot <- ggplot(earlier.years.summary) +
-  geom_boxplot(aes(x = site_no, y = Discharge.acft.yr)) +
+past.boxplot <- ggplot(earlier.years.summary, 
+                       aes(x = Site_Name, y = Discharge.acft.yr)) +
+  geom_boxplot()+
+  geom_jitter(width = 0.15) +
   geom_hline(yintercept = past.annual.average.discharge) +
-  labs(x = "", y = "Discharge (ac-ft/yr)")
-drought.boxplot <- ggplot(current.drought.summary) +
-  geom_boxplot(aes(x = site_no, y = Discharge.acft.yr)) +
+  scale_x_discrete(limits = c("Fontenelle", "Kremmling", "Flaming_Gorge", "Yampa", "GJ_Upstream", "Gunnison", "GJ_Downstream", "Green_River", "Dolores", "San_Juan", "Lee_Ferry", "Hoover", "Imperial")) +
+  labs(x = "", y = "Discharge (ac-ft/yr)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+drought.boxplot <- ggplot(current.drought.summary, 
+                          aes(x = Site_Name, y = Discharge.acft.yr)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.15) +
   geom_hline(yintercept = current.annual.average.discharge) +
-  labs(x = "Site", y = "Discharge (ac-ft/yr)")
+  scale_x_discrete(limits = c("Fontenelle", "Kremmling", "Flaming_Gorge", "Yampa", "GJ_Upstream", "Gunnison", "GJ_Downstream", "Green_River", "Dolores", "San_Juan", "Lee_Ferry", "Hoover", "Imperial")) +
+  labs(x = "Site", y = "Discharge (ac-ft/yr)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 Discharge.boxplot <- plot_grid(past.boxplot, drought.boxplot,
           ncol = 1,
           align = "hv")
 Discharge.boxplot
 ```
 
+Looking at discharge over time, we can see that there is a decreasing trend in many of the sites examined. In fact, the only sites that don't appear to have a decreasing trend are the Colorado at Kremmling, CO and below Hoover Dam, which actually appears to be increasing. The most significant decrease appears to be above Imperial Dam, which is the last dam before the river enters Mexico. This decrease doesn't align super well with the drought and is more likely due to management decisions made between the U.S. and Mexico to deal with salinity issues in the river entering Mexico. 
+
 ```{Annual Discharge, echo = FALSE, message = FALSE, fig.align ='left', fig.cap = "Annual Discharge over time"}
-annualdischarge.plot <- ggplot() +
-  geom_point(data = earlier.years.summary, 
-             aes(x = Water_Year, y = Discharge.acft.yr, color = site_no))+
-  geom_point(data = current.drought.summary, 
-             aes(x = Water_Year, y = Discharge.acft.yr, color = site_no))+
-  scale_x_discrete(breaks = seq(1964,2021,10)) +
+annualdischarge.plot <- ggplot(allyears.summary, 
+                                aes(x = Water_Year, y = Discharge.acft.yr,
+                                    color = Site_Name)) +
+  geom_point(alpha = 0.8) +
   scale_color_viridis_d() +
-  geom_smooth(method = lm) +
-  labs(x = "Water Year", y = "Discharge (ac-ft/yr)", color = "Gage")
+  scale_x_discrete(breaks = seq(1964,2021,5)) +
+  labs(x = "Water Year", y = "Discharge (ac-ft/yr)", color = "Site")
 annualdischarge.plot
 ```
 
+```{Annual Discharge Trends, echo = FALSE, message = FALSE, fig.align ='left', fig.cap = "Annual Discharge over time on log scale"}
+annualdischarge.trends <- ggplot(allyears.summary, 
+                                aes(x = as.numeric(Water_Year), y = Discharge.acft.yr,
+                                    color = Site_Name)) +
+  geom_point(alpha = 0.8) +
+  scale_color_viridis_d() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Time", y = "Discharge (ac-ft/yr)", color = "Site")
+annualdischarge.trends
+```
+
+Interestingly, we can see that the proportion of flows made up by baseflow is increasing over time. I'm not entirely sure why that is the case, but to me it shows the basin getting drier. A higher proportion baseflow combined with a decrease in discharge means that the baseflow is what is decreasing, either due to reduced snowpack and runoff, drier soils, or a combination of the two. 
 ```{Annual Proportion of Baseflow, echo = FALSE, message = FALSE, fig.align = 'left', fig.cap = "Annual Proportion of Baseflow Over Time"}
 annualpropbf.plot <- ggplot() +
   geom_point(data = earlier.years.summary,
-            aes(x = Water_Year, y = prop.baseflow, color = site_no))+
+            aes(x = Water_Year, y = prop.baseflow, color = Site_Name))+
   geom_point(data = current.drought.summary,
-            aes(x = Water_Year, y = prop.baseflow, color = site_no)) + 
-  scale_x_discrete(breaks = seq(1964,2021,10)) +
+            aes(x = Water_Year, y = prop.baseflow, color = Site_Name)) + 
+  scale_x_discrete(breaks = seq(1964,2021,5)) +
   scale_color_viridis_d() +
-  labs(x = "Water Year", y = "Baseflow Proportion", color = "Gage")
+  labs(x = "Water Year", y = "Baseflow Proportion", color = "Site")
 annualpropbf.plot
 ```
+
+
 \newpage
 
 # Summary and Conclusions
+The Colorado River Basin is experiencing extreme drought that is starting to show impacts on the river. There 
 
 \newpage
 
