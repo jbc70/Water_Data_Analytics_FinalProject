@@ -173,13 +173,17 @@ CO) \\
 \section{Exploratory Analysis}\label{exploratory-analysis}}
 
 First thing's first: take a look at what data we have to work with.
+
 \includegraphics{WDA_final_project_files/figure-latex/initial visualization-1.pdf}
-After initial visualization, the Gila river data has been thrown out
-because there are so many zeroes. This is potentially due to the fact
-that this gage site is very near Yuma, Arizona where there is
-significant agriculture. Diversions in this area could be artificially
-lowering the level of the river there because it is such a heavily
-agricultural area.
+
+That's a lot to look at and not particularly useful. So after a little
+more digging and some other vizualizations that are maybe slightly more
+helpful, including a log10 transformation on the y-axis, the Gila river
+data has been thrown out because there are so many zeroes. This is
+potentially due to the fact that this gage site is very near Yuma,
+Arizona where there is significant agriculture. Diversions in this area
+could be artificially lowering the level of the river there because it
+is such a heavily agricultural area.
 
 The next step in exploratory analysis is to wrangle the data into
 something useful. In this case, that means separating the data by gage.
@@ -195,7 +199,19 @@ started filling in 1963, so a significant change due to the dam would
 not be captured in the data. Both this prior period and the current
 drought were plotted by the Day of the Year to take a look at things and
 just see visually if there were any significant differences. There
-weren't any huge differences, but the plots are pretty neat.
+weren't any huge differences, but the plots are pretty neat. These are
+interesting plots to see the general pattern of flow throughout the
+year. In both plots, there is generally a spike between days 100 and
+200, followed by a decrease to day 300, where things head back up and
+level out for a bit. The presence of dams is really notable, as the
+gages in chartreuse and yellow are the ones at Hoover and Imperial dams,
+and the Lee Ferry gage is not visible hidden directly behind the other
+two. All three show how much the dams level out seasonal variability,
+however. It's also worth noting that the current period plot shows a
+much larger drop after day 200 than in previous years. This is
+interesting and may be a visible effect of what the drought looks like -
+late summer is particularly hot and dry causing regions no longer fed by
+snowmelt to really drop.
 
 \begin{figure}
 
@@ -311,6 +327,29 @@ across the whole system. This is a crude figure, but importantly shows
 that there is a significant decrease in water in the system. The lower
 basin appears to be exhibitng more stability during the drought,
 potentially due to management shifts in the 1990s with the completion of
-the Central Arizona Project,
+the Central Arizona Project.
+
+Baseflow proportion is increasing across the entire river system,
+reflecting decreased stormflow. In conjunction with the Day of Year plot
+in the exploratory analysis, this becomes really interesting. A decrease
+in stormflow may explain why there is such a steeper drop after day 200
+than in the earlier period. Fewer (or no) late summer storms means that
+all the water in certain regions is coming from baseflow (probably fed
+by snowmelt) and that drop is a depiction of the discharge really being
+depleted by that lack of stormflow. Snowmelt also is known to be
+happening faster and finishing a little earlier in the year due to
+climate change, so that big dip could also be reflecting the increased
+rate in that process as well.
+
+This analysis barely even started to scratch the surface of what could
+be analyzed looking at the impacts of this drought on the Colorado
+River. Looking forward, there are plenty of analyses still to be done to
+really gauge the changes the river is experiencing as a cause of this
+drought. There are comparisons to be made between the tributaries,
+between dammed and undammed sections, and examinations of Lakes Mead and
+Powell as well. This analysis really just confirmed what is pretty much
+common sense: 20+ years of drought can be seen in the data (even with
+such a simple, quick look) and there are many more avenues of
+exploration open.
 
 \end{document}

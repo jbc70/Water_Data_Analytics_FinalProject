@@ -109,7 +109,7 @@ Gage Number | Location
 # Exploratory Analysis
 First thing's first: take a look at what data we have to work with. 
 
-```{r initial visualization, echo=FALSE, message = FALSE, warning=FALSE}
+```{r initial visualization, echo=FALSE, message = FALSE, warning=FALSE, fig.align='left', fig.cap= "Initial Visualization of raw data"}
 rawdata.plot <- ggplot(allsites.raw, aes(x = Date, y = Discharge_cfs, color = site_no)) +
   geom_point(alpha = 0.5, size = 0.3) +
   scale_color_viridis_d() +
@@ -187,6 +187,7 @@ previous_DOYplot <- ggplot(earlier.years, aes(x = DOY, y = Discharge_cfs, color 
 #also neat
 previous_DOYplot
 ```
+\newpage
 
 The last wrangling steps were to create summary datasets to look at annual changes, although not pictured. Discharge in cubic feet per second was converted to acre-feet per year and averaged over a given water year. Using the lf-stat package, baseflow and stormflow were also calculated. Baseflow is a measure of the amount of water in a stream that comes from slower sources that consistently feeds the stream - like infiltration or runoff that seeps through soil and makes its way into the river bed. Stormflow is surface flow during a precipitation or melting event, and everything but stormflow is baseflow. In the following analysis, baseflow is examined to see if the source of the water in the river is potentially changing.
 
@@ -345,6 +346,7 @@ annualdischarge.trends <- ggplot(allyears.summary,
   labs(x = "Time", y = "Discharge (ac-ft/yr)", color = "Site")
 annualdischarge.trends
 ```
+\newpage
 
 Interestingly, we can see that the proportion of flows made up by baseflow is increasing over time. I'm not entirely sure why that is the case, but to me it shows the basin getting drier. A higher proportion baseflow combined with a decrease in discharge means that the baseflow is what is decreasing, either due to reduced snowpack and runoff, drier soils, or a combination of the two. 
 ```{r Proportion of Baseflow, echo = FALSE, message = FALSE, fig.align = 'left', fig.cap = "Annual Proportion of Baseflow Over Time"}
@@ -363,8 +365,8 @@ annualpropbf.plot
 \newpage
 
 # Summary and Conclusions
-The Colorado River Basin is experiencing extreme drought that is starting to show impacts on the river. There is a significant difference in mean discharge between the two time periods, about 700,000 acre-feet across the whole system. This is a crude figure, but importantly shows that there is a significant decrease in water in the system. The lower basin appears to be exhibitng more stability during the drought, potentially due to management shifts in the 1990s with the completion of the Central Arizona Project. 
+The Colorado River Basin is experiencing extreme drought that is starting to show impacts on the river. There is a significant difference in mean discharge between the two time periods, about 700,000 acre-feet across the whole system. This is a crude assessment, but importantly shows that there is a significant decrease in water in the system. The lower basin appears to be exhibiting more stability and less variability during the drought, potentially due to management shifts in the 1990s with the completion of the Central Arizona Project (Figure 4).
 
-Baseflow proportion is increasing across the entire river system, reflecting decreased stormflow. In conjunction with the Day of Year plot in the exploratory analysis, this becomes really interesting. A decrease in stormflow may explain why there is such a steeper drop after day 200 than in the earlier period. Fewer (or no) late summer storms means that all the water in certain regions is coming from baseflow (probably fed by snowmelt) and that drop is a depiction of the discharge really being depleted by that lack of stormflow. Snowmelt also is known to be happening faster and finishing a little earlier in the year due to climate change, so that big dip could also be reflecting the increased rate in that process as well.
+Baseflow proportion is increasing across the entire river system, reflecting decreased stormflow (Figure 7). In conjunction with the Day of Year plot in the exploratory analysis (Figure 2), this becomes really interesting. A decrease in stormflow may explain why there is such a steeper drop after day 200 than in the earlier period. Fewer (or no) late summer storms means that all the water in certain regions is coming from baseflow (probably fed by snowmelt) and that drop is a depiction of the discharge really being depleted by that lack of stormflow. Snowmelt also is known to be happening faster and finishing a little earlier in the year due to climate change, so that big dip could also be reflecting the increased rate in that process as well.
 
 This analysis barely even started to scratch the surface of what could be analyzed looking at the impacts of this drought on the Colorado River. Looking forward, there are plenty of analyses still to be done to really gauge the changes the river is experiencing as a cause of this drought. There are comparisons to be made between the tributaries, between dammed and undammed sections, and examinations of Lakes Mead and Powell as well. This analysis really just confirmed what is pretty much common sense: 20+ years of drought can be seen in the data (even with such a simple, quick look) and there are many more avenues of exploration open. 
