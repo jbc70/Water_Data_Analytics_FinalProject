@@ -244,7 +244,8 @@ current.drought.summary <- current.drought %>%
                               site_no == "09379500" ~ "San_Juan",
                               site_no == "09380000" ~ "Lee_Ferry",
                               site_no == "09421500" ~ "Hoover",
-                              site_no == "09429490" ~ "Imperial"))
+                              site_no == "09429490" ~ "Imperial")) %>%
+  na.omit
 
 earlier.years.summary <- earlier.years %>%
   group_by(site_no,Water_Year) %>%
@@ -265,7 +266,8 @@ earlier.years.summary <- earlier.years %>%
                               site_no == "09379500" ~ "San_Juan",
                               site_no == "09380000" ~ "Lee_Ferry",
                               site_no == "09421500" ~ "Hoover",
-                              site_no == "09429490" ~ "Imperial"))
+                              site_no == "09429490" ~ "Imperial")) %>%
+  na.omit
 
 #welp realized these are useful joined
 allyears.summary <- full_join(current.drought.summary, earlier.years.summary)
